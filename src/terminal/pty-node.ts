@@ -3,6 +3,7 @@
 
 import pty from "node-pty";
 import process from "node:process";
+import { execSync } from "node:child_process";
 import { EventEmitter } from "node:events";
 
 import type { IPtyBackend, PtyOptions } from "./pty.js";
@@ -56,7 +57,20 @@ export const createNodePty = (
     },
     kill() {
       try {
-        process.kill(handle.pid, 9);
+        if (process.platform === "win32") {
+          // Kill entire process tree on Windows
+          execSync(`taskkill /T /F /PID ${handle.pid}`, { stdio: "pipe" });
+        } else {
+          // Kill entire process group on Unix. The pty child is a session
+          // leader (forkpty creates a new session), so -pid targets all
+          // processes in its group — shell, droid, and any grandchildren.
+          process.kill(-handle.pid, "SIGKILL");
+        }
+      } catch {
+        // Process tree/group may have already exited
+      }
+      try {
+        handle.kill();
       } catch {
         // process may have already exited
       }

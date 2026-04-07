@@ -21,6 +21,7 @@ type TerminalOptions = {
   program?: {
     file: string;
     args?: string[];
+    cwd?: string;
   };
 };
 
@@ -52,10 +53,11 @@ export const spawn = async (
         `unable to spawn terminal, unable to resolve file '${file}' from PATH`
       );
     }
+    const cwd = options.program?.cwd || process.cwd();
     const ptyBackend = await createPty(resolvedFile, args ?? [], {
       cols: options.cols,
       rows: options.rows,
-      cwd: process.cwd(),
+      cwd,
       env: options.env,
     });
     return new Terminal(

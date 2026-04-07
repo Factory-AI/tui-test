@@ -37,5 +37,20 @@ export interface TestOptions {
      * The file's arguments as argv
      */
     args?: string[];
+
+    /**
+     * Working directory for the spawned program
+     */
+    cwd?: string;
   };
+
+  /**
+   * Workspace path, set in beforeSpawn hook
+   */
+  workspacePath?: string;
+
+  /**
+   * User home path, set in beforeSpawn hook
+   */
+  userHomePath?: string;
 }

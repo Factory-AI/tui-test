@@ -74,7 +74,17 @@ const runTest = async (
   }
   activeSuites.push(...enter);
 
-  const { shell, rows, columns, env, program } = test.suite.options ?? {};
+  let resolvedOptions = { ...(test.suite.options ?? {}) };
+
+  // Run beforeSpawn hooks (outermost to innermost) to allow per-test workspace setup
+  for (const s of test.suite.parentSuites()) {
+    for (const hook of s.beforeSpawnHooks) {
+      resolvedOptions = await Promise.resolve(hook(resolvedOptions));
+    }
+  }
+
+  const { shell, rows, columns, env, program, workspacePath, userHomePath } =
+    resolvedOptions;
   const traceEmitter = new EventEmitter();
   traceEmitter.on("data", (data: string, time: number) =>
     tracePoints.push({ data, time })
@@ -154,26 +164,30 @@ const runTest = async (
   }
 
   const suites = test.suite.parentSuites();
+  const testArgs = { terminal, workspacePath, userHomePath };
   try {
     for (const s of suites) {
       for (const hook of s.beforeEachHooks) {
-        await Promise.resolve(hook({ terminal }));
+        await Promise.resolve(hook(testArgs));
       }
     }
 
-    await Promise.resolve(test.testFunction({ terminal }));
+    await Promise.resolve(test.testFunction(testArgs));
   } finally {
     try {
-      for (const s of suites) {
-        for (const hook of s.afterEachHooks) {
-          await Promise.resolve(hook({ terminal }));
-        }
-      }
-    } finally {
-      try {
-        terminal.kill();
-      } catch {
-        // terminal can pre-terminate if program is provided
+      terminal.kill();
+    } catch {
+      // terminal can pre-terminate if program is provided
+    }
+    if (programExited) {
+      await Promise.race([
+        programExited,
+        new Promise<void>((r) => setTimeout(r, 5_000)),
+      ]);
+    }
+    for (const s of suites) {
+      for (const hook of s.afterEachHooks) {
+        await Promise.resolve(hook(testArgs));
       }
     }
   }

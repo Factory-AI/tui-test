@@ -294,6 +294,29 @@ export namespace test {
   };
 
   /**
+   * Declares a `beforeSpawn` hook that runs before the terminal is spawned for each test.
+   * The hook receives the resolved test options and must return (possibly modified) options.
+   * Use this to set up per-test workspaces, environment variables, or program arguments.
+   *
+   * **Usage**
+   *
+   * ```js
+   * import { test } from '@microsoft/tui-test';
+   *
+   * test.beforeSpawn(async (options) => {
+   *   return { ...options, workspacePath: '/tmp/test-workspace' };
+   * });
+   * ```
+   *
+   * @param fn The hook function. Receives current TestOptions, must return TestOptions.
+   */
+  export const beforeSpawn = (
+    fn: (options: TestOptions) => TestOptions | Promise<TestOptions>
+  ) => {
+    globalThis.suite.beforeSpawnHooks.push(fn);
+  };
+
+  /**
    * Declares a `beforeEach` hook that is executed before each test in the current scope.
    *
    * **Usage**

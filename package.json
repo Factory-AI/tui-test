@@ -1,5 +1,5 @@
 {
-  "name": "@microsoft/tui-test",
+  "name": "@factory/tui-test",
   "scripts": {
     "build": "npx tsc",
     "dev": "npm run build && node index.js",

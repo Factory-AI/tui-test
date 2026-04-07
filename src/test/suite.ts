@@ -15,6 +15,9 @@ export class Suite {
   source?: string;
   beforeAllHooks: HookFunction[] = [];
   afterAllHooks: HookFunction[] = [];
+  beforeSpawnHooks: Array<
+    (options: TestOptions) => TestOptions | Promise<TestOptions>
+  > = [];
   beforeEachHooks: TestFunction[] = [];
   afterEachHooks: TestFunction[] = [];
 
@@ -100,8 +103,8 @@ export const suiteFilePath = (suite: Suite) => {
 export const getRootSuite = async (
   config: Required<TestConfig>
 ): Promise<Suite> => {
-  const projects: (Required<Omit<ProjectConfig, "program">> &
-    Pick<ProjectConfig, "program">)[] = [
+  const projects: (Required<Omit<ProjectConfig, "program" | "workspacePath" | "userHomePath">> &
+    Pick<ProjectConfig, "program" | "workspacePath" | "userHomePath">)[] = [
     {
       shell: config.use.shell!,
       rows: config.use.rows!,
@@ -110,6 +113,8 @@ export const getRootSuite = async (
       name: "",
       env: config.use.env!,
       program: config.use.program,
+      workspacePath: config.use.workspacePath,
+      userHomePath: config.use.userHomePath,
     },
     ...(config.projects?.map((project) => ({
       shell: project.shell ?? config.use.shell!,
@@ -119,6 +124,8 @@ export const getRootSuite = async (
       testMatch: project.testMatch,
       env: project.env ?? config.use.env!,
       program: project.program ?? config.use.program,
+      workspacePath: project.workspacePath ?? config.use.workspacePath,
+      userHomePath: project.userHomePath ?? config.use.userHomePath,
     })) ?? []),
   ];
 

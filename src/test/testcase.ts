@@ -12,6 +12,8 @@ export type Location = {
 
 export type TestFunction = (args: {
   terminal: Terminal;
+  workspacePath?: string;
+  userHomePath?: string;
 }) => void | Promise<void>;
 
 export type HookFunction = () => void | Promise<void>;
