@@ -1,0 +1,43 @@
+package.json
+  a3cee3b858834062 2
+src/runner/worker.ts
+  a3cee3b858834062 37-38,46-47,53-56,84-94,174,178,182,185-197,211-212,245,414-415,432-433
+src/terminal/term.ts
+  a3cee3b858834062 24,56,60
+src/test/option.ts
+  a3cee3b858834062 40-44,46-55
+src/config/config.ts
+  a3cee3b858834062 26,137-142
+src/test/testcase.ts
+  a3cee3b858834062 15-16
+src/test/suite.ts
+  a3cee3b858834062 18-20,106-107,116-117,127-128
+src/runner/runner.ts
+  a3cee3b858834062 108-109,232-241
+src/index.ts
+  a3cee3b858834062 1-15
+src/test/test.ts
+  a3cee3b858834062 297-318
+src/terminal/pty-node.ts
+  a3cee3b858834062 6,60-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.2",
+  "base_commit_sha": "c11f49836e22874eac013deb37046b013c314268",
+  "prompts": {
+    "a3cee3b858834062": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "d54c3ef7-d3fa-4340-aabe-f26e9e328490",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "factory-davidgu",
+      "messages": [],
+      "total_additions": 176,
+      "total_deletions": 78,
+      "accepted_lines": 173,
+      "overriden_lines": 0
+    }
+  }
+}
