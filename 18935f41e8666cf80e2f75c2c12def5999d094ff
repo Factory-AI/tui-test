@@ -1,0 +1,27 @@
+src/terminal/locator.ts
+  636bce17df12b0ff 98
+package.json
+  636bce17df12b0ff 38
+src/terminal/shell.ts
+  636bce17df12b0ff 148
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.2",
+  "base_commit_sha": "18935f41e8666cf80e2f75c2c12def5999d094ff",
+  "prompts": {
+    "636bce17df12b0ff": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "2826c69e-b697-430d-a884-68229b594095",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "factory-davidgu",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 3,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
