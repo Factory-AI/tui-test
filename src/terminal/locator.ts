@@ -95,7 +95,7 @@ export class Locator {
         const baseY = this._full ? 0 : this._xterm.buffer.active.baseY;
         this._cells = [];
         for (let y = 0; y < buffer.length; y++) {
-          for (let x = 0; x < buffer[y].length ?? 0; x++) {
+          for (let x = 0; x < (buffer[y].length ?? 0); x++) {
             const pos = x + y * buffer[y].length;
             if (pos >= index && pos < index + length) {
               this._cells.push({

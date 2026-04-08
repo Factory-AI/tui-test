@@ -145,7 +145,7 @@ export const setupZshDotfiles = async () => {
 };
 
 export const getPythonPath = async (): Promise<string> => {
-  return await which("python", { nothrow: true });
+  return (await which("python", { nothrow: true })) ?? "python";
 };
 
 const gitBashPath = async (): Promise<string> => {
