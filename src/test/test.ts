@@ -16,6 +16,7 @@ export { Key, MouseKey } from "../terminal/ansi.js";
 import { TestOptions } from "./option.js";
 import { toMatchSnapshot } from "./matchers/toMatchSnapshot.js";
 import { Terminal } from "../terminal/term.js";
+export type { Terminal } from "../terminal/term.js";
 import { TestConfig } from "../config/config.js";
 import { toHaveBgColor } from "./matchers/toHaveBgColor.js";
 import { toHaveFgColor } from "./matchers/toHaveFgColor.js";
