@@ -41,8 +41,10 @@ type ExecutionOptions = {
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
+const activePools = new Set<Pool>();
+
 const createWorkerPool = (maxWorkers: number): Pool => {
-  return workerpool.pool(path.join(__dirname, "worker.js"), {
+  const pool = workerpool.pool(path.join(__dirname, "worker.js"), {
     workerType: "process",
     maxWorkers,
     forkOpts: {
@@ -54,6 +56,16 @@ const createWorkerPool = (maxWorkers: number): Pool => {
     },
     emitStdStreams: true,
   });
+  activePools.add(pool);
+  return pool;
+};
+
+const terminateAllPools = async () => {
+  const promises = [...activePools].map((pool) =>
+    pool.terminate(true).catch(() => {})
+  );
+  await Promise.allSettled(promises);
+  activePools.clear();
 };
 
 const runSuites = async (
@@ -118,6 +130,7 @@ const runSuites = async (
         }
         await filePool.exec("afterAllWorker", []);
       } finally {
+        activePools.delete(filePool);
         try {
           await filePool.terminate(true);
         } catch {
@@ -288,14 +301,27 @@ export const run = async (options: ExecutionOptions) => {
   }
   await reporter.start(allTests.length, shells, config.workers);
 
+  const forceExit = async (reason: string, code: number) => {
+    console.error(reason);
+    await terminateAllPools();
+    process.exit(code);
+  };
+
   if (config.globalTimeout > 0) {
     setTimeout(() => {
-      console.error(
-        `Error: global timeout (${config.globalTimeout} ms) exceeded`
+      void forceExit(
+        `Error: global timeout (${config.globalTimeout} ms) exceeded`,
+        1
       );
-      process.exit(1);
     }, config.globalTimeout);
   }
+
+  process.on("SIGTERM", () => {
+    void forceExit("Received SIGTERM, shutting down", 1);
+  });
+  process.on("SIGINT", () => {
+    void forceExit("Received SIGINT, shutting down", 1);
+  });
 
   await runSuites(
     rootSuite.suites,

@@ -6,7 +6,7 @@ import { EventEmitter } from "node:events";
 import workerpool from "workerpool";
 
 import { Suite } from "../test/suite.js";
-import { spawn } from "../terminal/term.js";
+import { spawn, Terminal } from "../terminal/term.js";
 import { defaultShell } from "../terminal/shell.js";
 import { Snapshot, TestCase, TestStatus } from "../test/testcase.js";
 import { expect } from "../test/test.js";
@@ -14,6 +14,8 @@ import { BaseReporter } from "../reporter/base.js";
 import { poll } from "../utils/poll.js";
 import { flushSnapshotExecutionCache } from "../test/matchers/toMatchSnapshot.js";
 import { saveTrace, TracePoint } from "../trace/tracer.js";
+
+const activeTerminals = new Set<Terminal>();
 
 type WorkerResult = {
   error?: string;
@@ -103,6 +105,7 @@ const runTest = async (
     trace,
     traceEmitter
   );
+  activeTerminals.add(terminal);
 
   // add slight delay for node-pty teardown
   let programExited: Promise<void> | undefined;
@@ -174,6 +177,7 @@ const runTest = async (
 
     await Promise.resolve(test.testFunction(testArgs));
   } finally {
+    activeTerminals.delete(terminal);
     try {
       terminal.kill();
     } catch {
@@ -455,6 +459,16 @@ if (!workerpool.isMainThread) {
   });
   process.on("unhandledRejection", () => {
     // prevent worker crashes from unhandled promise rejections
+  });
+  process.on("exit", () => {
+    for (const t of activeTerminals) {
+      try {
+        t.kill();
+      } catch {
+        // ignore
+      }
+    }
+    activeTerminals.clear();
   });
   workerpool.worker({
     testWorker: testWorker,
