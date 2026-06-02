@@ -1,0 +1,20 @@
+# factory-automation: ba1adf07-3c1a-4955-937a-9d652f8d8ec1
+name: Droid Wiki Refresh
+"on":
+  workflow_dispatch: {}
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - ready_for_review
+jobs:
+  wiki-refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Factory Droid
+        run: curl -fsSL https://app.factory.ai/cli | sh
+      - name: Generate wiki
+        run: droid exec --auto high "/wiki"
+        env:
+          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
