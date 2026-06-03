@@ -1,5 +1,4 @@
-# factory-automation: 633ce360-9071-4429-9349-1cb770d590f0
-name: Droid Wiki Refresh
+name: AutoWiki
 "on":
   workflow_dispatch: {}
   pull_request:
