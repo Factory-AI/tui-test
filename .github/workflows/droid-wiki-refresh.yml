@@ -1,5 +1,4 @@
-# factory-automation: 32844543-b635-46fb-b356-a600bd4dec4d
-name: Droid Wiki Refresh
+name: Factory-AI/tui-test
 "on":
   workflow_dispatch: {}
   pull_request:
