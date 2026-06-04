@@ -1,4 +1,3 @@
-# factory-automation: 9cf9a261-a3fe-49b4-8f15-940d708cb1a9
 name: Test Custom Automation
 "on":
   workflow_dispatch: {}
@@ -20,4 +19,4 @@ jobs:
         with:
           org_id: ${{ secrets.FACTORY_ORG_ID }}
           api_key: ${{ secrets.FACTORY_API_KEY }}
-          prompt: This is a test
+          prompt: lalalala this is a test
