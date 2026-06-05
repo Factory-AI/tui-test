@@ -1,0 +1,25 @@
+# factory-automation: 471de7d9-4941-4dd6-8be6-7c0c0b5eaf0c
+name: Eric Test
+"on":
+  workflow_dispatch: {}
+  pull_request:
+    types:
+      - opened
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Run Factory droid-action
+        uses: Factory-AI/droid-action@main
+        with:
+          org_id: ${{ secrets.FACTORY_ORG_ID }}
+          api_key: ${{ secrets.FACTORY_API_KEY }}
+          automatic_review: true
+          automatic_security_review: true
+          prompt: Automatic code review with security review enabled on pull requests.
