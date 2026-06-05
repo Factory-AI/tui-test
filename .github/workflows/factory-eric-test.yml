@@ -1,4 +1,4 @@
-name: Eric Test
+name: Factory-AI/tui-test
 "on":
   workflow_dispatch: {}
   pull_request:
@@ -21,4 +21,4 @@ jobs:
           api_key: ${{ secrets.FACTORY_API_KEY }}
           automatic_review: true
           automatic_security_review: true
-          prompt: This is a test edit lalalaa
+          prompt: This is a test lalalalala edit
