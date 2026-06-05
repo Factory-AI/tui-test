@@ -21,4 +21,4 @@ jobs:
           api_key: ${{ secrets.FACTORY_API_KEY }}
           automatic_review: true
           automatic_security_review: true
-          prompt: This is a test edit.
+          prompt: This is a test lalalala
