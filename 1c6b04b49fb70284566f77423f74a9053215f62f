@@ -1,0 +1,23 @@
+src/config/config.ts
+  9db4017c41f541b2 42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.2",
+  "base_commit_sha": "1c6b04b49fb70284566f77423f74a9053215f62f",
+  "prompts": {
+    "9db4017c41f541b2": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "8f8f24a9-96c6-4e85-a7e5-66f06436ef63",
+        "model": "claude-fable-5"
+      },
+      "human_author": "factory-davidgu",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 0,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
