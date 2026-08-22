@@ -39,6 +39,7 @@ export const loadConfig = async (): Promise<Required<TestConfig>> => {
       shell: userConfig.use?.shell ?? defaultShell,
       rows: userConfig.use?.rows ?? 30,
       columns: userConfig.use?.columns ?? 80,
+      env: userConfig.use?.env,
       program: userConfig.use?.program,
     },
   };
