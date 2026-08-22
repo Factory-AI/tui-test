@@ -1,0 +1,23 @@
+src/test/suite.ts
+  9db4017c41f541b2 144,146-147,158,160-161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.2",
+  "base_commit_sha": "856130974fc63525aa8f5e7b5f66df51f73535f5",
+  "prompts": {
+    "9db4017c41f541b2": {
+      "agent_id": {
+        "tool": "droid",
+        "id": "8f8f24a9-96c6-4e85-a7e5-66f06436ef63",
+        "model": "claude-fable-5"
+      },
+      "human_author": "factory-davidgu",
+      "messages": [],
+      "total_additions": 6,
+      "total_deletions": 0,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
