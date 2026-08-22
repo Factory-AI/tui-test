@@ -103,7 +103,9 @@ export const suiteFilePath = (suite: Suite) => {
 export const getRootSuite = async (
   config: Required<TestConfig>
 ): Promise<Suite> => {
-  const projects: (Required<Omit<ProjectConfig, "program" | "workspacePath" | "userHomePath">> &
+  const projects: (Required<
+    Omit<ProjectConfig, "program" | "workspacePath" | "userHomePath">
+  > &
     Pick<ProjectConfig, "program" | "workspacePath" | "userHomePath">)[] = [
     {
       shell: config.use.shell!,
@@ -139,7 +141,10 @@ export const getRootSuite = async (
           shell: project.shell,
           rows: project.rows,
           columns: project.columns,
+          env: project.env,
           program: project.program,
+          workspacePath: project.workspacePath,
+          userHomePath: project.userHomePath,
         });
         suite.suites = files.map(
           (file) =>
@@ -150,7 +155,10 @@ export const getRootSuite = async (
                 shell: project.shell,
                 rows: project.rows,
                 columns: project.columns,
+                env: project.env,
                 program: project.program,
+                workspacePath: project.workspacePath,
+                userHomePath: project.userHomePath,
               },
               suite
             )
