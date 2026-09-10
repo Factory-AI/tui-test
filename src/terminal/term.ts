@@ -43,7 +43,8 @@ type CursorPosition = {
 export const spawn = async (
   options: TerminalOptions,
   trace: boolean,
-  traceEmitter: EventEmitter
+  traceEmitter: EventEmitter,
+  onSpawn?: (terminal: Terminal) => void
 ): Promise<Terminal> => {
   if (options.program != null) {
     const { file, args } = options.program;
@@ -66,7 +67,8 @@ export const spawn = async (
       options.cols,
       trace,
       options.shell,
-      traceEmitter
+      traceEmitter,
+      onSpawn
     );
   }
   const { shellTarget, shellArgs } = await shellLaunch(options.shell);
@@ -87,7 +89,8 @@ export const spawn = async (
     options.cols,
     trace,
     options.shell,
-    traceEmitter
+    traceEmitter,
+    onSpawn
   );
 };
 
@@ -111,6 +114,7 @@ export class Terminal {
   private readonly _pty: IPtyBackend;
   private readonly _term: xterm.Terminal;
   private readonly _returnChar: string;
+  private readonly _output = new EventEmitter();
   private _exitResult: { exitCode: number; signal?: number } | null = null;
   private get _exited(): boolean {
     return this._exitResult !== null;
@@ -128,7 +132,8 @@ export class Terminal {
     private _cols: number,
     private _trace: boolean,
     private _shell: Shell,
-    private _traceEmitter: EventEmitter
+    private _traceEmitter: EventEmitter,
+    onSpawn?: (terminal: Terminal) => void
   ) {
     this._returnChar = this._shell == Shell.Xonsh ? "\n" : "\r";
     this._pty = ptyBackend;
@@ -140,14 +145,9 @@ export class Terminal {
     if (this._trace) {
       this._traceEmitter.emit("size", this._rows, this._cols);
     }
-    this._pty.onData((data) => {
-      if (this._trace) {
-        this._traceEmitter.emit("data", data, Date.now());
-      }
-      this._term.write(data);
-    });
     this._pty.onExit((exitResult) => {
       this._exitResult = exitResult;
+      this._output.removeAllListeners();
     });
     this.onExit = (callback) => {
       if (this._exitResult) {
@@ -155,6 +155,33 @@ export class Terminal {
       } else {
         this._pty.onExit(callback);
       }
+    };
+    // Install observers before subscribing to PTY output, including programs
+    // that issue terminal queries before beforeEach or the test body runs.
+    try {
+      onSpawn?.(this);
+    } catch (error) {
+      this.kill();
+      throw error;
+    }
+    this._pty.onData((data) => {
+      if (this._trace) {
+        this._traceEmitter.emit("data", data, Date.now());
+      }
+      this._term.write(data);
+      this._output.emit("data", data);
+    });
+  }
+
+  /**
+   * Observe raw PTY chunks, including escape sequences. Returns an unsubscribe
+   * function. Register in test.onSpawn to include the program's first output.
+   * Chunks do not necessarily align with terminal sequences.
+   */
+  onData(callback: (data: string) => void): () => void {
+    this._output.on("data", callback);
+    return () => {
+      this._output.off("data", callback);
     };
   }
 
@@ -535,6 +562,7 @@ export class Terminal {
    * Kill the terminal and underlying processes
    */
   kill() {
+    this._output.removeAllListeners();
     this._pty.kill();
   }
 }

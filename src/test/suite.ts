@@ -6,6 +6,7 @@ import { glob } from "glob";
 import { TestOptions } from "./option.js";
 import { TestConfig, ProjectConfig } from "../config/config.js";
 import type { TestCase, TestFunction, HookFunction } from "./testcase.js";
+import type { Terminal } from "../terminal/term.js";
 
 type SuiteType = "file" | "describe" | "project" | "root";
 
@@ -19,6 +20,7 @@ export class Suite {
     (options: TestOptions) => TestOptions | Promise<TestOptions>
   > = [];
   beforeEachHooks: TestFunction[] = [];
+  onSpawnHooks: Array<(terminal: Terminal) => void> = [];
   afterEachHooks: TestFunction[] = [];
 
   constructor(
