@@ -103,7 +103,14 @@ const runTest = async (
       program,
     },
     trace,
-    traceEmitter
+    traceEmitter,
+    (terminal) => {
+      for (const s of ancestry) {
+        for (const hook of s.onSpawnHooks) {
+          hook(terminal);
+        }
+      }
+    }
   );
   activeTerminals.add(terminal);
 

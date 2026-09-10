@@ -61,7 +61,7 @@ bunx @microsoft/tui-test
 
 ### Multi-platform / Multi-shell • No more "it works in my shell"
 
-**Multi-platform**. TUI Test supports testing on macOS, Linux, and Windows with a wide range of shells when installed: `cmd`, `windows powershell`, `powershell`, `bash`, `git-bash`, `fish`, `zsh`, and `xonsh`. 
+**Multi-platform**. TUI Test supports testing on macOS, Linux, and Windows with a wide range of shells when installed: `cmd`, `windows powershell`, `powershell`, `bash`, `git-bash`, `fish`, `zsh`, and `xonsh`.
 
 > Note: Bun is only supported on macOS and Linux.
 
@@ -85,6 +85,43 @@ test("git shows usage message", async ({ terminal }) => {
 });
 ```
 
+### Startup terminal queries
+
+Use `test.beforeSpawn` for asynchronous environment setup and `test.onSpawn`
+to install synchronous observers before the first PTY output is delivered.
+Unlike `beforeEach`, `onSpawn` runs before shell/program readiness. Nested
+hooks run outermost first, once per terminal, in the test worker.
+
+`terminal.onData` receives raw output, including escape sequences, and returns
+an unsubscribe function. Subscriptions end when the terminal exits or is killed.
+Output chunks can split a terminal sequence, so accumulate them when matching
+queries. Registering later observes only future output.
+
+```ts
+import { test, expect } from "@factory/tui-test";
+
+let output = "";
+test.onSpawn((terminal) => {
+  output = "";
+  let answered = false;
+  terminal.onData((chunk) => {
+    output += chunk;
+    if (!answered && output.includes("\x1b]11;?\x07")) {
+      answered = true;
+      terminal.write("\x1b]11;rgb:ffff/ffff/ffff\x07");
+    }
+  });
+});
+
+test("queries its background during startup", async () => {
+  expect(output).toContain("\x1b]11;?\x07");
+});
+```
+
+To model a slow terminal, schedule the response from the observer. To model a
+silent terminal, observe without writing a response. Keep assertions and awaited
+asynchronous work in test callbacks; `onSpawn` is synchronous.
+
 ### Terminal Screenshot
 
 This code snippet shows how to take a screenshot of the terminal.
@@ -93,7 +130,7 @@ This code snippet shows how to take a screenshot of the terminal.
 import { test, expect } from "@microsoft/tui-test";
 
 test("take a screenshot", async ({ terminal }) => {
-  terminal.write("foo")
+  terminal.write("foo");
 
   await expect(terminal.getByText("foo")).toBeVisible();
   await expect(terminal).toMatchSnapshot();
@@ -108,7 +145,7 @@ This code snippet shows how to use rich assertions of the terminal.
 import { test, expect } from "@microsoft/tui-test";
 
 test("make a regex assertion", async ({ terminal }) => {
-  terminal.submit("ls -l")
+  terminal.submit("ls -l");
 
   await expect(terminal.getByText(/total [0-9]{3}/g)).toBeVisible();
 });
@@ -129,9 +166,8 @@ import { defineConfig } from "@microsoft/tui-test";
 
 export default defineConfig({
   retries: 3,
-  trace: true
+  trace: true,
 });
-
 ```
 
 ## Contributing
@@ -155,4 +191,3 @@ trademarks or logos is subject to and must follow
 [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
 Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
 Any use of third-party trademarks or logos are subject to those third-party's policies.
-

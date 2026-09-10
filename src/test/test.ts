@@ -318,6 +318,22 @@ export namespace test {
   };
 
   /**
+   * Install synchronous terminal observers before the first PTY output is
+   * delivered, before shell readiness and beforeEach. Hooks run outermost first
+   * for each test. Use beforeSpawn for asynchronous environment setup.
+   *
+   * ```js
+   * let output = "";
+   * test.onSpawn((terminal) => {
+   *   terminal.onData((chunk) => { output += chunk; });
+   * });
+   * ```
+   */
+  export const onSpawn = (fn: (terminal: Terminal) => void) => {
+    globalThis.suite.onSpawnHooks.push(fn);
+  };
+
+  /**
    * Declares a `beforeEach` hook that is executed before each test in the current scope.
    *
    * **Usage**
